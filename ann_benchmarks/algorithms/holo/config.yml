@@ -1,0 +1,18 @@
+float:
+  any:
+  - base_args: ['@metric', Float, 0.1]
+    constructor: Holo
+    disabled: false
+    docker_tag: ann-benchmarks-holo
+    module: ann_benchmarks.algorithms.holo
+    name: holo-basic
+    run_groups:
+      basic-setup:
+        args: [{indexing_strategy: 'hnsw', quantization: None, pool_size: 5}]
+        query_args: [[[0.0, 0.95], [0.0, 1.0], [1.2, 0.95], [1.5, 0.95], [2.0, 0.95], [3.0, 0.95]]]
+      advanced-setup:
+        args: [{indexing_strategy: 'ivf', quantization: 'product.ratio="x16"', pool_size: 10}]
+        query_args: [[[0.0, 0.98], [0.0, 1.0], [1.2, 0.98], [1.5, 0.98], [2.0, 0.98], [3.0, 0.98]]]
+      high-load:
+        args: [{indexing_strategy: 'flat', quantization: 'quantization.scalar', pool_size: 20}]
+        query_args: [[[0.0, 1.0], [1.2, 1.0], [1.5, 1.0], [2.0, 1.0], [3.0, 1.0], [5, 1.0]]]
