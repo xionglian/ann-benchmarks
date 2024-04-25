@@ -5,7 +5,7 @@ float:
     disabled: false
     docker_tag: ann-benchmarks-relyt
     module: ann_benchmarks.algorithms.relyt
-    name: relyt
+    name: adbpg
     run_groups:
       adbpg:
         arg_groups: [{M: 64, efConstruction: 600, parallel_build: 4, external_storage: 0, pq_enable: 1}]

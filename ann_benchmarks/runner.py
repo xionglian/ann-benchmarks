@@ -133,7 +133,7 @@ def run_individual_query(algo: BaseANN, X_train: numpy.array, X_test: numpy.arra
         "distance": distance,
         "count": int(count),
     }
-    additional = algo.get_additional()
+    additional = algo.get_additional()
     for k in additional:
         attrs[k] = additional[k]
     return (attrs, results)
