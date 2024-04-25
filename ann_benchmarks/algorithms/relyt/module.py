@@ -1,13 +1,8 @@
 import multiprocessing
-import struct
 import time
 import numpy as np
 import os
-from psycopg import _struct
-from psycopg.types.array import _pack_head, _pack_dim
-from psycopg.types.array import ListBinaryDumper
 import psycopg
-from psycopg.types import TypeInfo
 
 
 from ..base.module import BaseANN
@@ -26,7 +21,6 @@ class Relyt(BaseANN):
         self._parallel_build_num = method_param['parallel_build']
         self._external_storage = method_param['external_storage']
         self._pq_enable = method_param['pq_enable']
-        self._pq_segments = method_param['pq_segments']
         self._insert_parallel = 15
         self._query_curs = []
         self._cur = None
@@ -121,11 +115,11 @@ class Relyt(BaseANN):
         start = time.time()
         if self._metric == "angular":
             cur.execute(
-                "CREATE INDEX items_embedding_idx_%d ON items USING hnsw(embedding vector_cosine_ops) WITH (dim=%d,m=%d,external_storage=%d,distancemeasure=cosine,ef_construction=%d,pq_enable=%d,pq_segments=%d)" % (dim, dim, self._m, self._external_storage, self._ef_construction, self._pq_enable, self._pq_segments)
+                "CREATE INDEX items_embedding_idx_%d ON items USING hnsw(embedding vector_cosine_ops) WITH (dim=%d,m=%d,external_storage=%d,distancemeasure=cosine,ef_construction=%d,pq_enable=%d)" % (dim, dim, self._m, self._external_storage, self._ef_construction, self._pq_enable)
             )
         elif self._metric == "euclidean":
             cur.execute(
-                "CREATE INDEX items_embedding_idx_%d ON items USING hnsw(embedding vector_l2_ops) WITH (dim=%d,m=%d,external_storage=%d,distancemeasure=l2,ef_construction=%d,pq_enable=%d,pq_segments=%d)" % (dim, dim, self._m, self._external_storage, self._ef_construction, self._pq_enable, self._pq_segments)
+                "CREATE INDEX items_embedding_idx_%d ON items USING hnsw(embedding vector_l2_ops) WITH (dim=%d,m=%d,external_storage=%d,distancemeasure=l2,ef_construction=%d,pq_enable=%d)" % (dim, dim, self._m, self._external_storage, self._ef_construction, self._pq_enable)
             )
         else:
             raise RuntimeError(f"unknown metric {self._metric}")
