@@ -45,7 +45,7 @@ class Relyt(BaseANN):
         cur = conn.cursor()
         for i in range(base, end):
             tmp = self._insert_data[i]
-            cur.execute(f"INSERT INTO {self._table_name} VALUES (%s, %s)", (i, tmp), binary=True, prepare=True)
+            cur.execute(f"INSERT INTO {self._table_name} VALUES (%s, %s)", (i, tmp),  prepare=True)
 
     def fit(self, X):
         conn = psycopg.connect(
@@ -105,6 +105,7 @@ class Relyt(BaseANN):
         print("creating index...")
         cur.execute("SET statement_timeout to 0")
         cur.execute("SET idle_in_transaction_session_timeout to 0")
+        cur.execute('SET vectors.pgvector_compatibility=on')
         cur.execute("SET fastann.build_parallel_processes to %d" % self._parallel_build_num)
         cur.execute("SET fastann.codebook_trainer_nthreads to %d" % self._parallel_build_num)
         # cur.execute(f"select count(1) from gp_dist_random('pg_ann_codebooks') where index = 'items_embedding_idx_{dim}' and enable = true")
@@ -115,11 +116,11 @@ class Relyt(BaseANN):
         start = time.time()
         if self._metric == "angular":
             cur.execute(
-                "CREATE INDEX items_embedding_idx_%d ON items USING hnsw(embedding vector_cosine_ops) WITH (dim=%d,m=%d,external_storage=%d,distancemeasure=cosine,ef_construction=%d,pq_enable=%d)" % (dim, dim, self._m, self._external_storage, self._ef_construction, self._pq_enable)
+                "CREATE INDEX items_embedding_idx_%d ON items USING hnsw(embedding vector_cosine_ops) WITH (m=%d,ef_construction=%d)" % (dim, self._m, self._ef_construction)
             )
         elif self._metric == "euclidean":
             cur.execute(
-                "CREATE INDEX items_embedding_idx_%d ON items USING hnsw(embedding vector_l2_ops) WITH (dim=%d,m=%d,external_storage=%d,distancemeasure=l2,ef_construction=%d,pq_enable=%d)" % (dim, dim, self._m, self._external_storage, self._ef_construction, self._pq_enable)
+                "CREATE INDEX items_embedding_idx_%d ON items USING hnsw(embedding vector_l2_ops) WITH (m=%d,ef_construction=%d)" % (dim, self._m, self._ef_construction)
             )
         else:
             raise RuntimeError(f"unknown metric {self._metric}")
