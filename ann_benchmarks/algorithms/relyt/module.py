@@ -2,6 +2,7 @@ import multiprocessing
 import struct
 import time
 import numpy as np
+import os
 from psycopg import _struct
 from psycopg.types.array import _pack_head, _pack_dim
 from psycopg.types.array import ListBinaryDumper
@@ -17,11 +18,11 @@ class Relyt(BaseANN):
         self._metric = metric
         self._m = method_param['M']
         self._ef_construction = method_param['efConstruction']
-        self._host = 'gp-xxxxxxx-master.gpdb.rds.aliyuncs.com'
-        self._port = 5432
-        self._dbname = 'xxxxx'
-        self._user = 'xxxxx'
-        self._password = 'xxxxx'
+        self._host = os.environ.get('rely_host')
+        self._port = os.environ.get('rely_port')
+        self._dbname = os.environ.get('rely_dbname')
+        self._user = os.environ.get('rely_user')
+        self._password = os.environ.get('rely_password')
         self._parallel_build_num = method_param['parallel_build']
         self._external_storage = method_param['external_storage']
         self._pq_enable = method_param['pq_enable']
