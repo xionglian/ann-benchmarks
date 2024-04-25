@@ -1,0 +1,12 @@
+float:
+  any:
+  - base_args: ['@metric']
+    constructor: Relyt
+    disabled: false
+    docker_tag: ann-benchmarks-relyt
+    module: ann_benchmarks.algorithms.relyt
+    name: adbpg
+    run_groups:
+      adbpg:
+        arg_groups: [{M: 64, efConstruction: 600, parallel_build: 4, external_storage: 0, pq_enable: 1}]
+        query_args: [[{ef_search: 400, max_scan_points: 2000, pq_amp: 10, parallel: 8}, {ef_search: 600, max_scan_points: 2000, pq_amp: 10, parallel: 8}]]
