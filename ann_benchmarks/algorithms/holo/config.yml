@@ -1,11 +1,11 @@
 float:
   any:
   - base_args: ['@metric']
-    constructor: Relyt
+    constructor: Holo
     disabled: false
-    docker_tag: ann-benchmarks-relyt
-    module: ann_benchmarks.algorithms.relyt
-    name: relyt
+    docker_tag: ann-benchmarks-holo
+    module: ann_benchmarks.algorithms.holo
+    name: holo
     run_groups:
       relyt:
         arg_groups: [{M: 64, efConstruction: 600, parallel_build: 4, external_storage: 0, pq_enable: 1}]

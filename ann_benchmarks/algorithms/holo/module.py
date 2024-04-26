@@ -7,7 +7,7 @@ import json
 
 from ..base.module import BaseANN
 
-class Relyt(BaseANN):
+class Holo(BaseANN):
     def __init__(self, metric, method_param):
         print("method_param: ", method_param)
         self._metric = metric
