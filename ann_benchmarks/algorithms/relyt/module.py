@@ -3,7 +3,7 @@ import time
 import numpy as np
 import os
 import psycopg
-
+import json
 
 from ..base.module import BaseANN
 
@@ -45,7 +45,10 @@ class Relyt(BaseANN):
         cur = conn.cursor()
         for i in range(base, end):
             tmp = self._insert_data[i]
-            cur.execute(f"INSERT INTO {self._table_name} VALUES (%s, %s)", (i, tmp),  prepare=True)
+            #print('str(tmp)', str(tmp))
+            tmp_list = tmp.tolist() if isinstance(tmp, np.ndarray) else tmp
+            # 使用转换后的列表进行 JSON 序列化
+            cur.execute(f"INSERT INTO {self._table_name} (id, embedding) VALUES ({i}, ARRAY{json.dumps(tmp_list)}::real[] )")
 
     def fit(self, X):
         conn = psycopg.connect(
@@ -193,17 +196,19 @@ class Relyt(BaseANN):
 
         _s = time.time()
         for i in range(base, end):
-            tmp = v
+            tmp = self._query_data[i].copy()
+            tmp = tmp.tolist() if isinstance(tmp, np.ndarray) else tmp
+            tmp = json.dumps(tmp)
             start = time.time()
-            cursor.execute(self._query, (tmp, n), binary=True, prepare=True)
+            cursor.execute(self._query, (tmp, n), prepare=True)
             local_cost_list[i-base] = time.time() - start
 
         print("total_time:", time.time()-_s)
 
         total_cost = sum(local_cost_list)
         # report qps for this worker
-        print("worker %d cost %.2f s, qps %.2f, mean rt %.5f, p99 rt %.5f" %
-              (proc_id, total_cost, (end - base) / total_cost, total_cost/len(local_cost_list), np.percentile(local_cost_list, 99)))
+        print("worker %d cost %.2f s, qps %.2f, mean rt %.5f, p50 rt %.5f, p95 rt %.5f, p99 rt %.5f" %
+              (proc_id, total_cost, (end - base) / total_cost, total_cost/len(local_cost_list), np.percentile(local_cost_list, 50), np.percentile(local_cost_list, 95), np.percentile(local_cost_list, 99)))
         conn.close()
         return
 
@@ -243,4 +248,3 @@ class Relyt(BaseANN):
 
     def __str__(self):
         return f"RELYT(m={self._m}, ef_construction={self._ef_construction}, ef_search={self._ef_search}, max_scan_pint={self._hnsw_max_scan_points}, pq_amp={self._pq_amp})"
-
